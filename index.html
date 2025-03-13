@@ -2,25 +2,43 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Регистрация пользователей</title>
+  <title>Регистрация и Земля с бегунком</title>
+  <style>
+    body { margin: 0; font-family: sans-serif; }
+    #registration { padding: 20px; background: #f5f5f5; }
+    #registration input, #registration button { padding: 8px; margin: 5px; }
+    #canvas-container { width: 100%; height: 70vh; }
+    #sliders { padding: 20px; background: #eaeaea; }
+  </style>
 </head>
 <body>
-  <h2>Регистрация</h2>
-  <form id="register-form">
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="password" id="password" placeholder="Пароль" required>
-    <button type="submit">Зарегистрироваться</button>
-  </form>
-  <div id="message"></div>
+  <!-- Форма регистрации -->
+  <div id="registration">
+    <h2>Регистрация пользователя</h2>
+    <form id="register-form">
+      <input type="email" id="email" placeholder="Email" required>
+      <input type="password" id="password" placeholder="Пароль" required>
+      <button type="submit">Зарегистрироваться</button>
+    </form>
+    <div id="message"></div>
+  </div>
 
-  <!-- Подключение Firebase SDK через модульный тег -->
+  <!-- Бегунок для изменения параметров Земли -->
+  <div id="sliders">
+    <label for="rotationSpeed">Скорость вращения Земли:</label>
+    <input type="range" id="rotationSpeed" min="0" max="0.1" step="0.001" value="0.01">
+    <span id="speedValue">0.010</span>
+  </div>
+
+  <!-- Контейнер для 3D-сцены -->
+  <div id="canvas-container"></div>
+
   <script type="module">
-    // Импорт необходимых функций из Firebase SDK
+    /**************** Firebase Registration ****************/
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-analytics.js";
 
-    // Ваши конфигурационные данные, полученные в консоли Firebase
+    // Конфигурация Firebase для вашего проекта
     const firebaseConfig = {
       apiKey: "AIzaSyCVyy35CjOqOHJVwposr1eZxKr0gojr-fA",
       authDomain: "abirvalg0.firebaseapp.com",
@@ -31,33 +49,90 @@
       measurementId: "G-70ERLYP98F"
     };
 
-    // Инициализация Firebase
-    const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
-    const auth = getAuth(app);
+    const fbApp = initializeApp(firebaseConfig);
+    const auth = getAuth(fbApp);
 
-    // Ждём загрузки DOM и обрабатываем форму регистрации
-    window.addEventListener('DOMContentLoaded', () => {
-      const form = document.getElementById('register-form');
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        
-        // Создание пользователя с Email/Password
-        createUserWithEmailAndPassword(auth, email, password)
-          .then((userCredential) => {
-            // Регистрация прошла успешно
-            document.getElementById('message').innerText = 'Регистрация прошла успешно!';
-            console.log('Пользователь зарегистрирован:', userCredential.user);
-          })
-          .catch((error) => {
-            // Обработка ошибок
-            document.getElementById('message').innerText = 'Ошибка: ' + error.message;
-            console.error('Ошибка регистрации:', error);
-          });
-      });
+    document.getElementById('register-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          document.getElementById('message').innerText = "Регистрация прошла успешно!";
+        })
+        .catch((error) => {
+          document.getElementById('message').innerText = "Ошибка: " + error.message;
+        });
     });
+
+    /**************** Three.js Earth с бегунком ****************/
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.module.js';
+    import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/controls/OrbitControls.js';
+
+    // Если браузер поддерживает WebGPU, пробуем использовать WebGPURenderer, иначе WebGLRenderer
+    let renderer;
+    if (navigator.gpu) {
+      import('https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/renderers/WebGPURenderer.js')
+        .then(module => {
+          renderer = new module.WebGPURenderer({ antialias: true });
+          initScene();
+        })
+        .catch(() => {
+          renderer = new THREE.WebGLRenderer({ antialias: true });
+          initScene();
+        });
+    } else {
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      initScene();
+    }
+
+    function initScene() {
+      const canvasContainer = document.getElementById('canvas-container');
+      renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
+      canvasContainer.appendChild(renderer.domElement);
+
+      // Создаем сцену и камеру
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x000000);
+      const camera = new THREE.PerspectiveCamera(75, canvasContainer.clientWidth / canvasContainer.clientHeight, 0.1, 1000);
+      camera.position.z = 3;
+
+      // Контролы для управления камерой
+      const controls = new OrbitControls(camera, renderer.domElement);
+
+      // Загружаем текстуру Земли
+      const textureLoader = new THREE.TextureLoader();
+      const earthTexture = textureLoader.load('https://threejs.org/examples/textures/land_ocean_ice_cloud_2048.jpg');
+
+      // Создаем сферу для Земли
+      const geometry = new THREE.SphereGeometry(1, 64, 64);
+      const material = new THREE.MeshBasicMaterial({ map: earthTexture });
+      const earth = new THREE.Mesh(geometry, material);
+      scene.add(earth);
+
+      // Обработка бегунка для изменения скорости вращения
+      let rotationSpeed = parseFloat(document.getElementById('rotationSpeed').value);
+      document.getElementById('rotationSpeed').addEventListener('input', (e) => {
+        rotationSpeed = parseFloat(e.target.value);
+        document.getElementById('speedValue').innerText = rotationSpeed.toFixed(3);
+      });
+
+      // Анимационный цикл
+      function animate() {
+        requestAnimationFrame(animate);
+        earth.rotation.y += rotationSpeed; // вращаем Землю
+        controls.update();
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      // Обработка изменения размера окна
+      window.addEventListener('resize', () => {
+        camera.aspect = canvasContainer.clientWidth / canvasContainer.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
+      });
+    }
   </script>
 </body>
 </html>
