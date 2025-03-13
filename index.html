@@ -1,178 +1,239 @@
-<script type="module">
-  /**************** Проверка Firebase ****************/
-  document.getElementById('status').textContent = "Подключение к Firebase...";
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Регистрация и простая 3D сцена</title>
+  <style>
+    body { margin: 0; font-family: sans-serif; }
+    #registration { padding: 20px; background: #f5f5f5; }
+    #registration input, #registration button { padding: 8px; margin: 5px; }
+    #canvas-container { width: 100%; height: 70vh; }
+    #sliders { padding: 20px; background: #eaeaea; }
+    #status { color: green; font-weight: bold; }
+    #error-log { color: red; font-weight: bold; padding: 10px; background-color: #f9e2e2; margin-top: 20px; }
+    #loading-message { color: blue; font-weight: bold; padding: 10px; background-color: #e0f7fa; }
+  </style>
+</head>
+<body>
+  <!-- Форма регистрации -->
+  <div id="registration">
+    <h2>Регистрация пользователя</h2>
+    <form id="register-form">
+      <input type="email" id="email" placeholder="Email" required>
+      <input type="password" id="password" placeholder="Пароль" required>
+      <button type="submit">Зарегистрироваться</button>
+    </form>
+    <div id="message"></div>
+    <div id="status"></div>
+  </div>
 
-  try {
-    // Импортируем Firebase модули
-    const firebaseAppModule = await import("https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js");
-    const firebaseAuthModule = await import("https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js");
+  <!-- Бегунки для изменения параметров сферы -->
+  <div id="sliders">
+    <label for="rotationSpeed">Скорость вращения:</label>
+    <input type="range" id="rotationSpeed" min="0" max="0.1" step="0.001" value="0.01">
+    <span id="speedValue">0.010</span>
+    
+    <br><br>
+    <label for="colorR">Красный:</label>
+    <input type="range" id="colorR" min="0" max="1" step="0.01" value="0.5">
+    
+    <label for="colorG">Зеленый:</label>
+    <input type="range" id="colorG" min="0" max="1" step="0.01" value="0.5">
+    
+    <label for="colorB">Синий:</label>
+    <input type="range" id="colorB" min="0" max="1" step="0.01" value="0.5">
+  </div>
 
-    const { initializeApp } = firebaseAppModule;
-    const { getAuth, createUserWithEmailAndPassword } = firebaseAuthModule;
+  <!-- Контейнер для 3D-сцены -->
+  <div id="canvas-container"></div>
 
-    document.getElementById('status').textContent = "Firebase модули загружены успешно";
+  <!-- Блок для отображения ошибок -->
+  <div id="error-log"></div>
+  
+  <!-- Блок для сообщения о загрузке -->
+  <div id="loading-message">Загрузка сцены... Пожалуйста, подождите.</div>
 
-    // Конфигурация Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyCVyy35CjOqOHJVwposr1eZxKr0gojr-fA",
-      authDomain: "abirvalg0.firebaseapp.com",
-      projectId: "abirvalg0",
-      storageBucket: "abirvalg0.firebasestorage.app",
-      messagingSenderId: "319471330024",
-      appId: "1:319471330024:web:81e90c0ce504012e1cdf5d",
-      measurementId: "G-70ERLYP98F"
-    };
+  <script type="module">
+    /**************** Проверка Firebase ****************/
+    document.getElementById('status').textContent = "Подключение к Firebase...";
 
-    // Инициализируем Firebase
-    const fbApp = initializeApp(firebaseConfig);
-    const auth = getAuth(fbApp);
+    try {
+      // Импортируем Firebase модули из CDN
+      const firebaseAppModule = await import("https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js");
+      const firebaseAuthModule = await import("https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js");
 
-    document.getElementById('status').textContent = "Firebase инициализирован успешно";
+      const { initializeApp } = firebaseAppModule;
+      const { getAuth, createUserWithEmailAndPassword } = firebaseAuthModule;
 
-    // Обработчик формы регистрации
-    document.getElementById('register-form').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
+      document.getElementById('status').textContent = "Firebase модули загружены успешно";
 
-      document.getElementById('message').innerText = "Попытка регистрации...";
+      // Конфигурация Firebase
+      const firebaseConfig = {
+        apiKey: "AIzaSyCVyy35CjOqOHJVwposr1eZxKr0gojr-fA",
+        authDomain: "abirvalg0.firebaseapp.com",
+        projectId: "abirvalg0",
+        storageBucket: "abirvalg0.firebasestorage.app",
+        messagingSenderId: "319471330024",
+        appId: "1:319471330024:web:81e90c0ce504012e1cdf5d",
+        measurementId: "G-70ERLYP98F"
+      };
 
-      createUserWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-          document.getElementById('message').innerText = "Регистрация прошла успешно!";
-        })
-        .catch((error) => {
-          document.getElementById('message').innerText = "Ошибка: " + error.message;
-          console.error("Firebase error:", error);
-        });
-    });
-  } catch (error) {
-    document.getElementById('status').textContent = "Ошибка при загрузке Firebase: " + error.message;
-    console.error("Firebase load error:", error);
-  }
+      // Инициализируем Firebase
+      const fbApp = initializeApp(firebaseConfig);
+      const auth = getAuth(fbApp);
 
-  /**************** Three.js простая сцена ****************/
-  try {
-    // Импортируем Three.js
-    const THREE = await import('https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.module.js');
-    const OrbitControlsModule = await import('https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/controls/OrbitControls.js');
-    const OrbitControls = OrbitControlsModule.OrbitControls;
+      document.getElementById('status').textContent = "Firebase инициализирован успешно";
 
-    const canvasContainer = document.getElementById('canvas-container');
+      // Обработчик формы регистрации
+      document.getElementById('register-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
 
-    // Создаем рендерер
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
-    canvasContainer.appendChild(renderer.domElement);
+        document.getElementById('message').innerText = "Попытка регистрации...";
 
-    // Создаем сцену и камеру
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x111111);
-
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      canvasContainer.clientWidth / canvasContainer.clientHeight,
-      0.1,
-      1000
-    );
-    camera.position.z = 5;
-
-    // Добавляем контролы
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-
-    // Добавляем освещение
-    const light1 = new THREE.DirectionalLight(0xffffff, 1);
-    light1.position.set(1, 1, 1);
-    scene.add(light1);
-
-    const light2 = new THREE.DirectionalLight(0xffffff, 0.5);
-    light2.position.set(-1, -1, -1);
-    scene.add(light2);
-
-    const ambientLight = new THREE.AmbientLight(0x404040);
-    scene.add(ambientLight);
-
-    // Создаем группу объектов
-    const group = new THREE.Group();
-    scene.add(group);
-
-    // Добавляем сферу
-    const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
-    const sphereMaterial = new THREE.MeshPhongMaterial({
-      color: 0x8888ff,
-      shininess: 100
-    });
-    const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-    group.add(sphere);
-
-    // Добавляем кольца вокруг сферы
-    const ringGeometry = new THREE.TorusGeometry(1.5, 0.1, 16, 100);
-    const ringMaterial = new THREE.MeshPhongMaterial({
-      color: 0xff8888,
-      shininess: 100
-    });
-    const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-    ring.rotation.x = Math.PI / 2;
-    group.add(ring);
-
-    const ring2Geometry = new THREE.TorusGeometry(1.8, 0.05, 16, 100);
-    const ring2Material = new THREE.MeshPhongMaterial({
-      color: 0x88ff88,
-      shininess: 100
-    });
-    const ring2 = new THREE.Mesh(ring2Geometry, ring2Material);
-    ring2.rotation.x = Math.PI / 3;
-    group.add(ring2);
-
-    // Обработчики слайдеров
-    let rotationSpeed = parseFloat(document.getElementById('rotationSpeed').value);
-
-    document.getElementById('rotationSpeed').addEventListener('input', (e) => {
-      rotationSpeed = parseFloat(e.target.value);
-      document.getElementById('speedValue').innerText = rotationSpeed.toFixed(3);
-    });
-
-    document.getElementById('colorR').addEventListener('input', updateColor);
-    document.getElementById('colorG').addEventListener('input', updateColor);
-    document.getElementById('colorB').addEventListener('input', updateColor);
-
-    function updateColor() {
-      const r = parseFloat(document.getElementById('colorR').value);
-      const g = parseFloat(document.getElementById('colorG').value);
-      const b = parseFloat(document.getElementById('colorB').value);
-
-      sphere.material.color.setRGB(r, g, b);
+        createUserWithEmailAndPassword(auth, email, password)
+          .then((userCredential) => {
+            document.getElementById('message').innerText = "Регистрация прошла успешно!";
+          })
+          .catch((error) => {
+            document.getElementById('message').innerText = "Ошибка: " + error.message;
+            logError("Firebase error:", error);
+          });
+      });
+    } catch (error) {
+      document.getElementById('status').textContent = "Ошибка при загрузке Firebase: " + error.message;
+      logError("Firebase load error:", error);
     }
 
-    // Анимационный цикл
-    function animate() {
-      requestAnimationFrame(animate);
+    /**************** Three.js простая сцена ****************/
+    try {
+      // Показать сообщение о загрузке 3D-сцены
+      document.getElementById('loading-message').textContent = "Загружается 3D-сцена... Пожалуйста, подождите. Это может занять некоторое время.";
 
-      group.rotation.y += rotationSpeed;
-      ring.rotation.z += rotationSpeed * 0.5;
-      ring2.rotation.z -= rotationSpeed * 0.3;
+      // Импортируем локальные модули Three.js и OrbitControls
+      const THREE = await import('./libs/three/three.module.js');
+      const OrbitControlsModule = await import('./libs/three/OrbitControls.js');
+      const OrbitControls = OrbitControlsModule.OrbitControls;
 
-      controls.update();
-      renderer.render(scene, camera);
+      document.getElementById('loading-message').textContent = "3D-сцена загружена успешно!";
+
+      const canvasContainer = document.getElementById('canvas-container');
+
+      // Создаем рендерер
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
+      canvasContainer.appendChild(renderer.domElement);
+
+      // Создаем сцену и камеру
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x111111);
+
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        canvasContainer.clientWidth / canvasContainer.clientHeight,
+        0.1,
+        1000
+      );
+      camera.position.z = 5;
+
+      // Добавляем контролы
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+
+      // Добавляем освещение
+      const light1 = new THREE.DirectionalLight(0xffffff, 1);
+      light1.position.set(1, 1, 1);
+      scene.add(light1);
+
+      const light2 = new THREE.DirectionalLight(0xffffff, 0.5);
+      light2.position.set(-1, -1, -1);
+      scene.add(light2);
+
+      const ambientLight = new THREE.AmbientLight(0x404040);
+      scene.add(ambientLight);
+
+      // Создаем группу объектов
+      const group = new THREE.Group();
+      scene.add(group);
+
+      // Добавляем сферу
+      const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
+      const sphereMaterial = new THREE.MeshPhongMaterial({
+        color: 0x8888ff,
+        shininess: 100
+      });
+      const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+      group.add(sphere);
+
+      // Добавляем кольца вокруг сферы
+      const ringGeometry = new THREE.TorusGeometry(1.5, 0.1, 16, 100);
+      const ringMaterial = new THREE.MeshPhongMaterial({
+        color: 0xff8888,
+        shininess: 100
+      });
+      const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+      ring.rotation.x = Math.PI / 2;
+      group.add(ring);
+
+      const ring2Geometry = new THREE.TorusGeometry(1.8, 0.05, 16, 100);
+      const ring2Material = new THREE.MeshPhongMaterial({
+        color: 0x88ff88,
+        shininess: 100
+      });
+      const ring2 = new THREE.Mesh(ring2Geometry, ring2Material);
+      ring2.rotation.x = Math.PI / 3;
+      group.add(ring2);
+
+      // Обработчики слайдеров
+      let rotationSpeed = parseFloat(document.getElementById('rotationSpeed').value);
+
+      document.getElementById('rotationSpeed').addEventListener('input', (e) => {
+        rotationSpeed = parseFloat(e.target.value);
+        document.getElementById('speedValue').innerText = rotationSpeed.toFixed(3);
+      });
+
+      document.getElementById('colorR').addEventListener('input', updateColor);
+      document.getElementById('colorG').addEventListener('input', updateColor);
+      document.getElementById('colorB').addEventListener('input', updateColor);
+
+      function updateColor() {
+        const r = parseFloat(document.getElementById('colorR').value);
+        const g = parseFloat(document.getElementById('colorG').value);
+        const b = parseFloat(document.getElementById('colorB').value);
+        sphere.material.color.setRGB(r, g, b);
+      }
+
+      // Анимационный цикл
+      function animate() {
+        requestAnimationFrame(animate);
+        group.rotation.y += rotationSpeed;
+        ring.rotation.z += rotationSpeed * 0.5;
+        ring2.rotation.z -= rotationSpeed * 0.3;
+        controls.update();
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      // Обработка изменения размера окна
+      window.addEventListener('resize', () => {
+        const width = canvasContainer.clientWidth;
+        const height = canvasContainer.clientHeight;
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        renderer.setSize(width, height);
+      });
+
+    } catch (error) {
+      console.error("Three.js error:", error);
+      logError("Ошибка при загрузке 3D-сцены:", error);
     }
-    animate();
 
-    // Обработка изменения размера окна
-    window.addEventListener('resize', () => {
-      const width = canvasContainer.clientWidth;
-      const height = canvasContainer.clientHeight;
-
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-      renderer.setSize(width, height);
-    });
-
-  } catch (error) {
-    console.error("Three.js error:", error);
-    document.getElementById('canvas-container').innerHTML =
-      `<div style="color: red; padding: 20px;">
-        Ошибка при загрузке 3D-сцены: ${error.message}
-       </div>`;
-  }
-</script>
+    // Функция для логирования ошибок на экран
+    function logError(message, error) {
+      console.error(message, error);
+      document.getElementById('error-log').innerText = `${message}: ${error.message}`;
+    }
+  </script>
+</body>
+</html>
