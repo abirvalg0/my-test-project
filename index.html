@@ -3,88 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Three.js Keyframe Animation Example</title>
+    <title>Three.js Earth</title>
     <style>
         body { margin: 0; }
         canvas { display: block; }
     </style>
     <!-- Загружаем Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- Загружаем OrbitControls отдельно -->
+    <!-- Загружаем OrbitControls -->
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <!-- Загружаем GLTFLoader -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
     <script>
         try {
             console.log("Загрузка Three.js...");
             console.log("Three.js версия:", THREE.REVISION);
-            
-            // Проверяем наличие OrbitControls
-            if (typeof THREE.OrbitControls === 'undefined') {
-                console.log("OrbitControls доступны через:", typeof THREE.OrbitControls);
-            }
-            
-            console.log("Three.js и OrbitControls загружены успешно!");
-            
+
             // Создание сцены, камеры и рендера
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            const renderer = new THREE.WebGLRenderer();
+            const renderer = new THREE.WebGLRenderer();  // Используем стандартный WebGL рендер
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.body.appendChild(renderer.domElement);
             console.log("Сцена и рендер созданы!");
-            
-            // Загружаем модель
-            const loader = new THREE.GLTFLoader();
-            const modelURL = 'https://threejs.org/examples/models/gltf/AnimatedMorphSphere.glb'; // Проверьте доступность этой модели
 
-            loader.load(
-                modelURL, 
-                function(gltf) {
-                    const model = gltf.scene;
-                    scene.add(model);
-                    
-                    // Устанавливаем анимацию
-                    const mixer = new THREE.AnimationMixer(model);
-                    gltf.animations.forEach((clip) => {
-                        mixer.clipAction(clip).play();
-                    });
-                    
-                    console.log("Модель и анимация загружены!");
-                    
-                    // Камера
-                    camera.position.z = 5;
-                    
-                    // OrbitControls для управления камерой
-                    const controls = new THREE.OrbitControls(camera, renderer.domElement);
-                    console.log("OrbitControls настроены!");
-                    
-                    // Анимация сцены
-                    function animate() {
-                        requestAnimationFrame(animate);
-                        mixer.update(0.01);  // обновляем анимацию
-                        controls.update();  // обновляем управление камерой
-                        renderer.render(scene, camera);
-                    }
-                    animate();
-                    console.log("Анимация запущена!");
-                    
-                    // Обработка изменения размера окна
-                    window.addEventListener('resize', () => {
-                        renderer.setSize(window.innerWidth, window.innerHeight);
-                        camera.aspect = window.innerWidth / window.innerHeight;
-                        camera.updateProjectionMatrix();
-                    });
-                },
-                undefined, // Прогресс загрузки, можно оставить пустым
-                function(error) {
-                    console.error('Ошибка при загрузке модели:', error);
-                    document.body.innerHTML = "<h1>Произошла ошибка при загрузке модели: " + error.message + "</h1>";
-                }
-            );
-            
+            // Настройки для текстуры Земли
+            const earthTextureURL = 'https://threejs.org/examples/textures/earth.jpg'; // Текстура Земли
+            const normalMapURL = 'https://threejs.org/examples/textures/earth_normal_map.jpg'; // Нормальная карта для Земли
+
+            // Создаем текстуру для Земли
+            const earthTexture = new THREE.TextureLoader().load(earthTextureURL);
+            const normalMap = new THREE.TextureLoader().load(normalMapURL);
+
+            const geometry = new THREE.SphereGeometry(1, 64, 64); // Сфера для Земли
+            const material = new THREE.MeshStandardMaterial({
+                map: earthTexture,
+                normalMap: normalMap,
+                roughness: 0.5,
+                metalness: 0.2
+            });
+            const earth = new THREE.Mesh(geometry, material);
+            scene.add(earth);
+
+            // Освещение для сцены
+            const light = new THREE.PointLight(0xffffff, 1, 100);
+            light.position.set(0, 0, 5);
+            scene.add(light);
+
+            // Камера
+            camera.position.z = 3;
+
+            // OrbitControls для управления камерой
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+            // Анимация сцены
+            function animate() {
+                requestAnimationFrame(animate);
+                earth.rotation.y += 0.01;  // Вращаем Землю
+                controls.update();  // Обновляем управление камерой
+                renderer.render(scene, camera);  // Рендерим сцену
+            }
+            animate();
+            console.log("Анимация запущена!");
+
+            // Обработка изменения размера окна
+            window.addEventListener('resize', () => {
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+            });
         } catch (error) {
             console.error("Ошибка при инициализации Three.js:", error);
             document.body.innerHTML = "<h1>Произошла ошибка при загрузке Three.js: " + error.message + "</h1>";
