@@ -3,70 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Three.js Example</title>
+    <title>Three.js Keyframe Animation Example</title>
     <style>
         body { margin: 0; }
         canvas { display: block; }
     </style>
+    <!-- Загружаем Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Загружаем OrbitControls отдельно -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- Загружаем GLTFLoader -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
-    <script type="module">
+    <script>
         try {
-            // Проверка наличия Three.js и OrbitControls
-            if (typeof THREE === 'undefined') {
-                throw new Error('Three.js не загружен');
+            console.log("Загрузка Three.js...");
+            console.log("Three.js версия:", THREE.REVISION);
+            
+            // Проверяем наличие OrbitControls
+            if (typeof THREE.OrbitControls === 'undefined') {
+                console.log("OrbitControls доступны через:", typeof THREE.OrbitControls);
             }
-            if (typeof OrbitControls === 'undefined') {
-                throw new Error('OrbitControls не загружен');
-            }
-
+            
+            console.log("Three.js и OrbitControls загружены успешно!");
+            
             // Создание сцены, камеры и рендера
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             const renderer = new THREE.WebGLRenderer();
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.body.appendChild(renderer.domElement);
+            console.log("Сцена и рендер созданы!");
+            
+            // Загружаем модель
+            const loader = new THREE.GLTFLoader();
+            const modelURL = 'https://threejs.org/examples/models/gltf/AnimatedMorphSphere.glb'; // Проверьте доступность этой модели
 
-            // Добавление куба в сцену
-            const geometry = new THREE.BoxGeometry();
-            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-            const cube = new THREE.Mesh(geometry, material);
-            scene.add(cube);
-
-            // Камера
-            camera.position.z = 5;
-
-            // OrbitControls
-            const controls = new OrbitControls(camera, renderer.domElement);
-
-            // Функция анимации
-            function animate() {
-                requestAnimationFrame(animate);
-
-                // Анимация вращения куба
-                cube.rotation.x += 0.01;
-                cube.rotation.y += 0.01;
-
-                // Обновление управления
-                controls.update();
-
-                // Рендер сцены
-                renderer.render(scene, camera);
-            }
-
-            // Запуск анимации
-            animate();
-
-            // Обработчик изменения размера окна
-            window.addEventListener('resize', () => {
-                renderer.setSize(window.innerWidth, window.innerHeight);
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-            });
-
+            loader.load(
+                modelURL, 
+                function(gltf) {
+                    const model = gltf.scene;
+                    scene.add(model);
+                    
+                    // Устанавливаем анимацию
+                    const mixer = new THREE.AnimationMixer(model);
+                    gltf.animations.forEach((clip) => {
+                        mixer.clipAction(clip).play();
+                    });
+                    
+                    console.log("Модель и анимация загружены!");
+                    
+                    // Камера
+                    camera.position.z = 5;
+                    
+                    // OrbitControls для управления камерой
+                    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+                    console.log("OrbitControls настроены!");
+                    
+                    // Анимация сцены
+                    function animate() {
+                        requestAnimationFrame(animate);
+                        mixer.update(0.01);  // обновляем анимацию
+                        controls.update();  // обновляем управление камерой
+                        renderer.render(scene, camera);
+                    }
+                    animate();
+                    console.log("Анимация запущена!");
+                    
+                    // Обработка изменения размера окна
+                    window.addEventListener('resize', () => {
+                        renderer.setSize(window.innerWidth, window.innerHeight);
+                        camera.aspect = window.innerWidth / window.innerHeight;
+                        camera.updateProjectionMatrix();
+                    });
+                },
+                undefined, // Прогресс загрузки, можно оставить пустым
+                function(error) {
+                    console.error('Ошибка при загрузке модели:', error);
+                    document.body.innerHTML = "<h1>Произошла ошибка при загрузке модели: " + error.message + "</h1>";
+                }
+            );
+            
         } catch (error) {
-            console.error("Ошибка при инициализации Three.js:", error.message);
-            document.body.innerHTML = "<h1>Произошла ошибка при загрузке Three.js. Проверьте консоль для подробностей.</h1>";
+            console.error("Ошибка при инициализации Three.js:", error);
+            document.body.innerHTML = "<h1>Произошла ошибка при загрузке Three.js: " + error.message + "</h1>";
         }
     </script>
 </body>
