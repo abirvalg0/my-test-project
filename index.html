@@ -11,39 +11,63 @@
 </head>
 <body>
     <script type="module">
-        import * as THREE from './libs/three/three.module.js';
-        import { OrbitControls } from './libs/three/OrbitControls.js';
+        try {
+            // Проверка наличия Three.js и OrbitControls
+            if (typeof THREE === 'undefined') {
+                throw new Error('Three.js не загружен');
+            }
+            if (typeof OrbitControls === 'undefined') {
+                throw new Error('OrbitControls не загружен');
+            }
 
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
-
-        const geometry = new THREE.BoxGeometry();
-        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-        const cube = new THREE.Mesh(geometry, material);
-        scene.add(cube);
-
-        camera.position.z = 5;
-
-        const controls = new OrbitControls(camera, renderer.domElement);
-
-        function animate() {
-            requestAnimationFrame(animate);
-            cube.rotation.x += 0.01;
-            cube.rotation.y += 0.01;
-            controls.update();
-            renderer.render(scene, camera);
-        }
-
-        animate();
-
-        window.addEventListener('resize', () => {
+            // Создание сцены, камеры и рендера
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer();
             renderer.setSize(window.innerWidth, window.innerHeight);
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-        });
+            document.body.appendChild(renderer.domElement);
+
+            // Добавление куба в сцену
+            const geometry = new THREE.BoxGeometry();
+            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+            const cube = new THREE.Mesh(geometry, material);
+            scene.add(cube);
+
+            // Камера
+            camera.position.z = 5;
+
+            // OrbitControls
+            const controls = new OrbitControls(camera, renderer.domElement);
+
+            // Функция анимации
+            function animate() {
+                requestAnimationFrame(animate);
+
+                // Анимация вращения куба
+                cube.rotation.x += 0.01;
+                cube.rotation.y += 0.01;
+
+                // Обновление управления
+                controls.update();
+
+                // Рендер сцены
+                renderer.render(scene, camera);
+            }
+
+            // Запуск анимации
+            animate();
+
+            // Обработчик изменения размера окна
+            window.addEventListener('resize', () => {
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+            });
+
+        } catch (error) {
+            console.error("Ошибка при инициализации Three.js:", error.message);
+            document.body.innerHTML = "<h1>Произошла ошибка при загрузке Three.js. Проверьте консоль для подробностей.</h1>";
+        }
     </script>
 </body>
 </html>
