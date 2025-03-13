@@ -35,8 +35,8 @@
 
   <script type="module">
     /**************** Firebase Registration ****************/
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
     // Конфигурация Firebase для вашего проекта
     const firebaseConfig = {
@@ -69,22 +69,9 @@
     import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.module.js';
     import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/controls/OrbitControls.js';
 
-    // Если браузер поддерживает WebGPU, пробуем использовать WebGPURenderer, иначе WebGLRenderer
-    let renderer;
-    if (navigator.gpu) {
-      import('https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/renderers/WebGPURenderer.js')
-        .then(module => {
-          renderer = new module.WebGPURenderer({ antialias: true });
-          initScene();
-        })
-        .catch(() => {
-          renderer = new THREE.WebGLRenderer({ antialias: true });
-          initScene();
-        });
-    } else {
-      renderer = new THREE.WebGLRenderer({ antialias: true });
-      initScene();
-    }
+    // Используем только WebGLRenderer для совместимости
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    initScene();
 
     function initScene() {
       const canvasContainer = document.getElementById('canvas-container');
@@ -100,15 +87,20 @@
       // Контролы для управления камерой
       const controls = new OrbitControls(camera, renderer.domElement);
 
-      // Загружаем текстуру Земли из локальной папки
+      // Используем URL удаленной текстуры Земли вместо локальной
       const textureLoader = new THREE.TextureLoader();
-      const earthTexture = textureLoader.load('textures/land_ocean_ice_cloud_2048.jpg');
+      // Используем общедоступное изображение Земли из NASA
+      const earthTexture = textureLoader.load('https://svs.gsfc.nasa.gov/vis/a000000/a002900/a002915/bluemarble-2048.jpg');
 
       // Создаем сферу для Земли
       const geometry = new THREE.SphereGeometry(1, 64, 64);
       const material = new THREE.MeshBasicMaterial({ map: earthTexture });
       const earth = new THREE.Mesh(geometry, material);
       scene.add(earth);
+
+      // Добавляем базовое освещение
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+      scene.add(ambientLight);
 
       // Обработка бегунка для изменения скорости вращения
       let rotationSpeed = parseFloat(document.getElementById('rotationSpeed').value);
@@ -128,9 +120,11 @@
 
       // Обработка изменения размера окна
       window.addEventListener('resize', () => {
-        camera.aspect = canvasContainer.clientWidth / canvasContainer.clientHeight;
+        const newWidth = canvasContainer.clientWidth;
+        const newHeight = canvasContainer.clientHeight;
+        camera.aspect = newWidth / newHeight;
         camera.updateProjectionMatrix();
-        renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
+        renderer.setSize(newWidth, newHeight);
       });
     }
   </script>
