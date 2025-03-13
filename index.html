@@ -100,9 +100,9 @@
       // Контролы для управления камерой
       const controls = new OrbitControls(camera, renderer.domElement);
 
-      // Загружаем текстуру Земли
+      // Загружаем текстуру Земли из локальной папки
       const textureLoader = new THREE.TextureLoader();
-      const earthTexture = textureLoader.load('https://threejs.org/examples/textures/land_ocean_ice_cloud_2048.jpg');
+      const earthTexture = textureLoader.load('textures/land_ocean_ice_cloud_2048.jpg');
 
       // Создаем сферу для Земли
       const geometry = new THREE.SphereGeometry(1, 64, 64);
