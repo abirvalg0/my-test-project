@@ -27,20 +27,15 @@
             document.body.appendChild(renderer.domElement);
             console.log("Сцена и рендер созданы!");
 
-            // Настройки для текстуры Земли (путь на вашем сервере)
-            const earthTextureURL = 'textures/land_ocean_ice_cloud_2048.jpg'; // Локальный путь
-            const normalMapURL = 'textures/earth_normal_map_2048.jpg'; // Локальный путь для нормальной карты
+            // Настройки для текстуры Земли (относительный путь)
+            const earthTextureURL = 'textures/land_ocean_ice_cloud_2048.jpg'; // Относительный путь
 
-            // Создаем текстуру для Земли
+            // Загружаем текстуру для Земли
             const earthTexture = new THREE.TextureLoader().load(earthTextureURL);
-            const normalMap = new THREE.TextureLoader().load(normalMapURL);
 
             const geometry = new THREE.SphereGeometry(1, 64, 64); // Сфера для Земли
             const material = new THREE.MeshStandardMaterial({
-                map: earthTexture,
-                normalMap: normalMap,
-                roughness: 0.5,
-                metalness: 0.2
+                map: earthTexture, // Используем одну текстуру
             });
             const earth = new THREE.Mesh(geometry, material);
             scene.add(earth);
