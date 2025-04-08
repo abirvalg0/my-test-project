@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подтверждение заказа - ВодныйТранспорт</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <!-- Подключение Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>ВодныйТранспорт</h1>
+                <p>Билеты на теплоходы в Санкт-Петербурге</p>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Главная</a></li>
+                    <li><a href="tickets.html">Билеты</a></li>
+                    <li><a href="index.html#about">О нас</a></li>
+                    <li><a href="index.html#contact">Контакты</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="confirmation">
+        <div class="container">
+            <div class="confirmation-container">
+                <div class="confirmation-icon">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#4CAF50" stroke-width="2"/>
+                        <path d="M8 12L10.5 14.5L16 9" stroke="#4CAF50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                
+                <h2>Заказ успешно оформлен!</h2>
+                
+                <div class="order-details" id="order-details">
+                    <!-- Детали заказа будут загружены из JS -->
+                    <div class="loading">Загрузка информации о заказе...</div>
+                </div>
+                
+                <div class="confirmation-message">
+                    <p>Билет отправлен на указанный вами email. Пожалуйста, проверьте вашу почту (включая папку "Спам").</p>
+                    <p>Вы также можете сохранить или распечатать электронный билет прямо сейчас:</p>
+                    <button id="download-ticket" class="btn">Скачать билет</button>
+                    <button id="print-ticket" class="btn">Распечатать билет</button>
+                </div>
+                
+                <div class="next-steps">
+                    <h3>Что дальше?</h3>
+                    <p>Просто приходите на причал за 15 минут до отправления теплохода. Предъявите электронный или распечатанный билет нашему сотруднику.</p>
+                    <a href="index.html" class="btn btn-primary">Вернуться на главную</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 ВодныйТранспорт. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script src="js/firebase-config.js"></script>
+    <script src="js/confirmation.js"></script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ВодныйТранспорт - Билеты на теплоходы в Санкт-Петербурге</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <!-- Подключение Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>ВодныйТранспорт</h1>
+                <p>Билеты на теплоходы в Санкт-Петербурге</p>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html" class="active">Главная</a></li>
+                    <li><a href="tickets.html">Билеты</a></li>
+                    <li><a href="#about">О нас</a></li>
+                    <li><a href="#contact">Контакты</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h2>Увидеть Санкт-Петербург с воды</h2>
+            <p>Незабываемые прогулки по рекам и каналам Северной столицы</p>
+            <a href="tickets.html" class="btn btn-primary">Купить билеты</a>
+        </div>
+    </section>
+
+    <section class="featured-ships">
+        <div class="container">
+            <h2>Наши теплоходы</h2>
+            <div class="ships-grid">
+                <div class="ship-card">
+                    <img src="img/ships/aurora.jpg" alt="Теплоход Аврора">
+                    <h3>Аврора</h3>
+                    <p>Классический теплоход для экскурсий по Неве</p>
+                    <a href="tickets.html?ship=aurora" class="btn">Выбрать рейс</a>
+                </div>
+                <div class="ship-card">
+                    <img src="img/ships/neva.jpg" alt="Теплоход Нева">
+                    <h3>Нева</h3>
+                    <p>Комфортабельный теплоход с панорамными окнами</p>
+                    <a href="tickets.html?ship=neva" class="btn">Выбрать рейс</a>
+                </div>
+                <div class="ship-card">
+                    <img src="img/ships/baltic.jpg" alt="Теплоход Балтика">
+                    <h3>Балтика</h3>
+                    <p>Просторный теплоход для больших групп</p>
+                    <a href="tickets.html?ship=baltic" class="btn">Выбрать рейс</a>
+                </div>
+                <div class="ship-card">
+                    <img src="img/ships/fontanka.jpg" alt="Теплоход Фонтанка">
+                    <h3>Фонтанка</h3>
+                    <p>Уютный теплоход для прогулок по каналам</p>
+                    <a href="tickets.html?ship=fontanka" class="btn">Выбрать рейс</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="routes" id="routes">
+        <div class="container">
+            <h2>Популярные маршруты</h2>
+            <div class="routes-grid">
+                <div class="route-card">
+                    <h3>Обзорная экскурсия по Неве</h3>
+                    <p>Продолжительность: 1 час</p>
+                    <p>Стоимость: от 800 руб.</p>
+                </div>
+                <div class="route-card">
+                    <h3>Поездка под разводными мостами</h3>
+                    <p>Продолжительность: 2 часа</p>
+                    <p>Стоимость: от 1200 руб.</p>
+                </div>
+                <div class="route-card">
+                    <h3>Каналы Петербурга</h3>
+                    <p>Продолжительность: 1.5 часа</p>
+                    <p>Стоимость: от 1000 руб.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="about" id="about">
+        <div class="container">
+            <h2>О нас</h2>
+            <p>Компания "ВодныйТранспорт" предлагает уникальную возможность увидеть Санкт-Петербург с воды. Наши комфортабельные теплоходы курсируют по Неве и каналам города, предоставляя гостям незабываемые впечатления.</p>
+            <p>Мы работаем с 2010 года и за это время обслужили более 500,000 довольных клиентов. Азаза).</p>
+        </div>
+    </section>
+
+    <section class="contact" id="contact">
+        <div class="container">
+            <h2>Контакты</h2>
+            <div class="contact-info">
+                <div>
+                    <h3>Адрес</h3>
+                    <p>г. Санкт-Петербург, Набережная Мойки, 10</p>
+                </div>
+                <div>
+                    <h3>Телефон</h3>
+                    <p>+7 (812) 123-45-67</p>
+                </div>
+                <div>
+                    <h3>Email</h3>
+                    <p>info@watertransportservice.ru</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 ВодныйТранспорт. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script src="js/firebase-config.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
