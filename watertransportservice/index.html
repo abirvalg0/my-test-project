@@ -3,66 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Теплоходные экскурсии</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>ВодныйТранспорт - Билеты на теплоходы в Санкт-Петербурге</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <!-- Подключение Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 </head>
 <body>
     <header>
         <div class="container">
-            <h1>Теплоходные экскурсии</h1>
-            <p>Незабываемые прогулки по воде</p>
+            <div class="logo">
+                <h1>ВодныйТранспорт</h1>
+                <p>Билеты на теплоходы в Санкт-Петербурге</p>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html" class="active">Главная</a></li>
+                    <li><a href="tickets.html">Билеты</a></li>
+                    <li><a href="#about">О нас</a></li>
+                    <li><a href="#contact">Контакты</a></li>
+                </ul>
+            </nav>
         </div>
     </header>
 
-    <main class="container">
-        <section class="intro">
-            <h2>Добро пожаловать!</h2>
-            <p>Выберите одну из наших уникальных экскурсий и насладитесь прекрасными видами с воды.</p>
-            <div class="actions">
-                <a href="verify.html" class="btn">Проверить бронирование</a>
-            </div>
-        </section>
+    <section class="hero">
+        <div class="container">
+            <h2>Увидеть Санкт-Петербург с воды</h2>
+            <p>Незабываемые прогулки по рекам и каналам Северной столицы</p>
+            <a href="tickets.html" class="btn btn-primary">Купить билеты</a>
+        </div>
+    </section>
 
-        <section class="tours">
-            <h2>Ближайшие экскурсии</h2>
-            <div id="tours-container" class="tours-grid">
-                <!-- Сюда будут загружены экскурсии с сервера -->
-                <div class="loading">Загрузка экскурсий...</div>
+    <section class="featured-ships">
+        <div class="container">
+            <h2>Наши теплоходы</h2>
+            <div class="ships-grid">
+                <div class="ship-card">
+                    <img src="img/ships/aurora.jpg" alt="Теплоход Аврора">
+                    <h3>Аврора</h3>
+                    <p>Классический теплоход для экскурсий по Неве</p>
+                    <a href="tickets.html?ship=aurora" class="btn">Выбрать рейс</a>
+                </div>
+                <div class="ship-card">
+                    <img src="img/ships/neva.jpg" alt="Теплоход Нева">
+                    <h3>Нева</h3>
+                    <p>Комфортабельный теплоход с панорамными окнами</p>
+                    <a href="tickets.html?ship=neva" class="btn">Выбрать рейс</a>
+                </div>
+                <div class="ship-card">
+                    <img src="img/ships/baltic.jpg" alt="Теплоход Балтика">
+                    <h3>Балтика</h3>
+                    <p>Просторный теплоход для больших групп</p>
+                    <a href="tickets.html?ship=baltic" class="btn">Выбрать рейс</a>
+                </div>
+                <div class="ship-card">
+                    <img src="img/ships/fontanka.jpg" alt="Теплоход Фонтанка">
+                    <h3>Фонтанка</h3>
+                    <p>Уютный теплоход для прогулок по каналам</p>
+                    <a href="tickets.html?ship=fontanka" class="btn">Выбрать рейс</a>
+                </div>
             </div>
-        </section>
-    </main>
+        </div>
+    </section>
+
+    <section class="routes" id="routes">
+        <div class="container">
+            <h2>Популярные маршруты</h2>
+            <div class="routes-grid">
+                <div class="route-card">
+                    <h3>Обзорная экскурсия по Неве</h3>
+                    <p>Продолжительность: 1 час</p>
+                    <p>Стоимость: от 800 руб.</p>
+                </div>
+                <div class="route-card">
+                    <h3>Поездка под разводными мостами</h3>
+                    <p>Продолжительность: 2 часа</p>
+                    <p>Стоимость: от 1200 руб.</p>
+                </div>
+                <div class="route-card">
+                    <h3>Каналы Петербурга</h3>
+                    <p>Продолжительность: 1.5 часа</p>
+                    <p>Стоимость: от 1000 руб.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="about" id="about">
+        <div class="container">
+            <h2>О нас</h2>
+            <p>Компания "ВодныйТранспорт" предлагает уникальную возможность увидеть Санкт-Петербург с воды. Наши комфортабельные теплоходы курсируют по Неве и каналам города, предоставляя гостям незабываемые впечатления.</p>
+            <p>Мы работаем с 2010 года и за это время обслужили более 500000000000 довольных клиентов. </p>
+        </div>
+    </section>
+
+    <section class="contact" id="contact">
+        <div class="container">
+            <h2>Контакты</h2>
+            <div class="contact-info">
+                <div>
+                    <h3>Адрес</h3>
+                    <p>г. Санкт-Петербург, Набережная Мойки, 10</p>
+                </div>
+                <div>
+                    <h3>Телефон</h3>
+                    <p>+7 (812) 123-45-67</p>
+                </div>
+                <div>
+                    <h3>Email</h3>
+                    <p>info@watertransportservice.ru</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <footer>
         <div class="container">
-            <p>&copy; 2025 Теплоходные экскурсии. Все права защищены.</p>
+            <p>&copy; 2025 ВодныйТранспорт. Все права защищены.</p>
         </div>
     </footer>
 
-    <!-- Модальное окно для бронирования -->
-    <div id="booking-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2>Забронировать экскурсию</h2>
-            <div id="booking-details"></div>
-            <form id="booking-form">
-                <input type="hidden" id="tour-id" name="tourId">
-                <div class="form-group">
-                    <label for="customer-name">Ваше имя:</label>
-                    <input type="text" id="customer-name" name="customerName" placeholder="Введите ваше полное имя" required>
-                </div>
-                <div class="form-group">
-                    <label for="customer-phone">Телефон:</label>
-                    <input type="tel" id="customer-phone" name="customerPhone" placeholder="+7 (___) ___-__-__" required>
-                </div>
-                <div class="form-group">
-                    <label for="tickets-count">Количество билетов:</label>
-                    <input type="number" id="tickets-count" name="ticketsCount" min="1" max="10" value="1" required>
-                </div>
-                <button type="submit" class="btn primary-btn">Перейти к оплате</button>
-            </form>
-        </div>
-    </div>
-
-    <script src="script.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>

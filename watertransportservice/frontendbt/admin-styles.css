@@ -1,0 +1,242 @@
+/* Основные стили для административной панели */
+
+:root {
+  --admin-primary: #2c3e50;
+  --admin-secondary: #3498db;
+  --admin-accent: #e74c3c;
+  --admin-light: #ecf0f1;
+  --admin-success: #2ecc71;
+  --admin-warning: #f39c12;
+  --admin-danger: #e74c3c;
+}
+
+.admin-container {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin: 2rem auto;
+}
+
+.admin-section {
+  margin-bottom: 2rem;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.admin-form {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-row .form-group {
+  flex: 1;
+  min-width: 200px;
+}
+
+.admin-tabs {
+  display: flex;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.tab-btn {
+  padding: 0.8rem 1.5rem;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.tab-btn:hover {
+  background-color: #f5f5f5;
+}
+
+.tab-btn.active {
+  border-bottom: 3px solid var(--admin-secondary);
+  color: var(--admin-secondary);
+}
+
+.tab-content {
+  padding: 1rem 0;
+}
+
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.search-filter {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.search-filter input {
+  flex: 1;
+  padding: 0.7rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.search-filter select {
+  padding: 0.7rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  min-width: 150px;
+}
+
+.table-container {
+  overflow-x: auto;
+  margin-bottom: 2rem;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.admin-table th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+}
+
+.admin-table tbody tr:hover {
+  background-color: #f9f9f9;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.edit-btn {
+  background-color: var(--admin-secondary);
+  color: white;
+}
+
+.delete-btn {
+  background-color: var(--admin-danger);
+  color: white;
+}
+
+.view-btn {
+  background-color: var(--admin-light);
+  color: var(--admin-primary);
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.status-paid {
+  background-color: #e6f7ee;
+  color: var(--admin-success);
+}
+
+.status-pending {
+  background-color: #fff6e6;
+  color: var(--admin-warning);
+}
+
+.status-canceled {
+  background-color: #fdeaea;
+  color: var(--admin-danger);
+}
+
+.empty-message {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  font-style: italic;
+}
+
+.wide-modal .modal-content {
+  width: 90%;
+  max-width: 800px;
+}
+
+.booking-details {
+  margin-bottom: 1.5rem;
+}
+
+.booking-details p {
+  margin-bottom: 0.5rem;
+}
+
+.booking-info-group {
+  padding: 1rem;
+  background-color: #f5f7fa;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.form-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.status-btn {
+  background-color: var(--admin-warning);
+  color: white;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .admin-header, .content-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .admin-tabs {
+    flex-wrap: wrap;
+  }
+  
+  .search-filter {
+    flex-direction: column;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+}

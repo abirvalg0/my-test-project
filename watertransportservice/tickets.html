@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Выбор билетов - ВодныйТранспорт</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <!-- Подключение Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>ВодныйТранспорт</h1>
+                <p>Билеты на теплоходы в Санкт-Петербурге</p>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Главная</a></li>
+                    <li><a href="tickets.html" class="active">Билеты</a></li>
+                    <li><a href="index.html#about">О нас</a></li>
+                    <li><a href="index.html#contact">Контакты</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="ticket-selection">
+        <div class="container">
+            <h2>Выбор билетов</h2>
+            
+            <div class="filter-container">
+                <div class="filter-group">
+                    <label for="ship-select">Теплоход:</label>
+                    <select id="ship-select">
+                        <option value="all">Все теплоходы</option>
+                        <option value="aurora">Аврора</option>
+                        <option value="neva">Нева</option>
+                        <option value="baltic">Балтика</option>
+                        <option value="fontanka">Фонтанка</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="route-select">Маршрут:</label>
+                    <select id="route-select">
+                        <option value="all">Все маршруты</option>
+                        <option value="neva-overview">Обзорная по Неве</option>
+                        <option value="bridges">Разводные мосты</option>
+                        <option value="canals">Каналы Петербурга</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="date-select">Дата:</label>
+                    <input type="date" id="date-select" min="">
+                </div>
+            </div>
+            
+            <div class="tickets-container" id="tickets-list">
+                <!-- Билеты будут загружены из JS -->
+                <div class="loading">Загрузка доступных билетов...</div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 ВодныйТранспорт. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script src="js/firebase-config.js"></script>
+    <script src="data/ships.js"></script>
+    <script src="js/tickets.js"></script>
+</body>
+</html>

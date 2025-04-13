@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель администратора | Теплоходные экскурсии</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="admin-styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Панель администратора</h1>
+            <p>Управление теплоходными экскурсиями</p>
+        </div>
+    </header>
+
+    <main class="container admin-container">
+        <!-- Страница логина -->
+        <div id="login-section" class="admin-section">
+            <h2>Вход в систему</h2>
+            <form id="login-form" class="admin-form">
+                <div class="form-group">
+                    <label for="username">Логин:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Пароль:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn primary-btn">Войти</button>
+            </form>
+        </div>
+
+        <!-- Главная панель управления (скрыта до входа) -->
+        <div id="admin-dashboard" class="admin-section" style="display: none;">
+            <div class="admin-header">
+                <h2>Панель управления</h2>
+                <button id="logout-btn" class="btn">Выйти</button>
+            </div>
+
+            <div class="admin-tabs">
+                <button class="tab-btn active" data-tab="tours">Экскурсии</button>
+                <button class="tab-btn" data-tab="bookings">Бронирования</button>
+                <button class="tab-btn" data-tab="settings">Настройки</button>
+            </div>
+
+            <!-- Управление экскурсиями -->
+            <div id="tours-tab" class="tab-content">
+                <div class="content-header">
+                    <h3>Управление экскурсиями</h3>
+                    <button id="add-tour-btn" class="btn primary-btn">Добавить экскурсию</button>
+                </div>
+
+                <div class="search-filter">
+                    <input type="text" id="tour-search" placeholder="Поиск экскурсий...">
+                </div>
+
+                <div class="table-container">
+                    <table id="tours-table" class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Название</th>
+                                <th>Дата</th>
+                                <th>Время</th>
+                                <th>Цена</th>
+                                <th>Мест доступно</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Данные будут загружены через JavaScript -->
+                        </tbody>
+                    </table>
+                    <div id="tours-loading" class="loading">Загрузка экскурсий...</div>
+                    <div id="tours-empty" class="empty-message" style="display: none;">Экскурсий не найдено. Создайте новую экскурсию.</div>
+                </div>
+            </div>
+
+            <!-- Управление бронированиями -->
+            <div id="bookings-tab" class="tab-content" style="display: none;">
+                <div class="content-header">
+                    <h3>Управление бронированиями</h3>
+                </div>
+
+                <div class="search-filter">
+                    <input type="text" id="booking-search" placeholder="Поиск бронирований...">
+                    <select id="booking-status-filter">
+                        <option value="all">Все статусы</option>
+                        <option value="paid">Оплачено</option>
+                        <option value="pending">Ожидает оплаты</option>
+                        <option value="canceled">Отменено</option>
+                    </select>
+                </div>
+
+                <div class="table-container">
+                    <table id="bookings-table" class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Код</th>
+                                <th>Экскурсия</th>
+                                <th>Клиент</th>
+                                <th>Телефон</th>
+                                <th>Билеты</th>
+                                <th>Сумма</th>
+                                <th>Статус</th>
+                                <th>Дата бронирования</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Данные будут загружены через JavaScript -->
+                        </tbody>
+                    </table>
+                    <div id="bookings-loading" class="loading">Загрузка бронирований...</div>
+                    <div id="bookings-empty" class="empty-message" style="display: none;">Бронирований не найдено.</div>
+                </div>
+            </div>
+
+            <!-- Настройки сайта -->
+            <div id="settings-tab" class="tab-content" style="display: none;">
+                <div class="content-header">
+                    <h3>Настройки сайта</h3>
+                </div>
+
+                <form id="settings-form" class="admin-form">
+                    <div class="form-group">
+                        <label for="site-title">Название сайта:</label>
+                        <input type="text" id="site-title" name="siteTitle">
+                    </div>
+                    <div class="form-group">
+                        <label for="site-description">Описание:</label>
+                        <textarea id="site-description" name="siteDescription" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact-phone">Контактный телефон:</label>
+                        <input type="tel" id="contact-phone" name="contactPhone">
+                    </div>
+                    <div class="form-group">
+                        <label for="contact-email">Email:</label>
+                        <input type="email" id="contact-email" name="contactEmail">
+                    </div>
+                    <button type="submit" class="btn primary-btn">Сохранить настройки</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Модальное окно для добавления/редактирования экскурсии -->
+        <div id="tour-modal" class="modal">
+            <div class="modal-content wide-modal">
+                <span class="close-button">&times;</span>
+                <h2 id="tour-modal-title">Добавить экскурсию</h2>
+                <form id="tour-form" class="admin-form">
+                    <input type="hidden" id="tour-id" name="tourId">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tour-name">Название экскурсии:</label>
+                            <input type="text" id="tour-name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tour-price">Цена (₽):</label>
+                            <input type="number" id="tour-price" name="price" min="0" step="50" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tour-date">Дата:</label>
+                            <input type="date" id="tour-date" name="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tour-departure-time">Время отправления:</label>
+                            <input type="time" id="tour-departure-time" name="departureTime" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tour-return-time">Время возвращения:</label>
+                            <input type="time" id="tour-return-time" name="returnTime" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tour-capacity">Общая вместимость:</label>
+                            <input type="number" id="tour-capacity" name="capacity" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tour-available-seats">Доступно мест:</label>
+                            <input type="number" id="tour-available-seats" name="availableSeats" min="0" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="tour-description">Описание:</label>
+                        <textarea id="tour-description" name="description" rows="4" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="tour-image">Изображение (URL):</label>
+                        <input type="text" id="tour-image" name="imageUrl" placeholder="https://example.com/image.jpg">
+                    </div>
+                    <div class="form-buttons">
+                        <button type="button" class="btn" id="cancel-tour-btn">Отмена</button>
+                        <button type="submit" class="btn primary-btn">Сохранить</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Модальное окно для просмотра/редактирования бронирования -->
+        <div id="booking-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h2>Информация о бронировании</h2>
+                <div id="booking-details" class="booking-details">
+                    <!-- Данные будут загружены через JavaScript -->
+                </div>
+                <div class="form-buttons">
+                    <button type="button" class="btn" id="close-booking-btn">Закрыть</button>
+                    <button type="button" class="btn status-btn" id="change-status-btn">Изменить статус</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Теплоходные экскурсии. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script src="admin-script.js"></script>
+</body>
+</html>
