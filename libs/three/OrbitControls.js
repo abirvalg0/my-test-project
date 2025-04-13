@@ -1,1 +1,0 @@
-const updated_orbit_controls_content = "new content";
