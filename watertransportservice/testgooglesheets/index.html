@@ -26,46 +26,74 @@
             max-width: 100%;
             height: auto;
             border-radius: 4px;
+            max-height: 300px;
         }
         h2 {
             color: #2c3e50;
             border-bottom: 2px solid #eee;
             padding-bottom: 10px;
         }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
     <h1>Данные из Google Sheets</h1>
     <div id="content">Загрузка данных...</div>
+    <div id="debug" class="error"></div>
 
     <script>
-        // URL вашей опубликованной таблицы
-        const sheetsUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT9JpnLPiX07DYnrdHrmQYJA_WMxQWjdVjJ1y7fZ3w7_n-VpfHxfNWAt_u05IL8G3KZcaYetYImK39O/pubhtml';
-
-        // Используем прокси для обхода CORS
-        fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(sheetsUrl)}`)
+        // URL вашей опубликованной таблицы в CSV формате
+        const sheetsUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT9JpnLPiX07DYnrdHrmQYJA_WMxQWjdVjJ1y7fZ3w7_n-VpfHxfNWAt_u05IL8G3KZcaYetYImK39O/pub?output=csv';
+        
+        // Прямой запрос к CSV (более надежный способ)
+        fetch(sheetsUrl)
             .then(response => {
-                if (!response.ok) throw new Error('Ошибка сети');
-                return response.json();
+                if (!response.ok) throw new Error('Ошибка сети: ' + response.status);
+                return response.text();
             })
-            .then(data => {
-                const parser = new DOMParser();
-                const htmlDoc = parser.parseFromString(data.contents, 'text/html');
-                const table = htmlDoc.querySelector('table');
-                
-                if (!table) throw new Error('Таблица не найдена');
-                
-                // Преобразуем таблицу в массив
-                const rows = Array.from(table.querySelectorAll('tr'));
+            .then(csvData => {
+                // Парсим CSV
+                const rows = csvData.split('\n').filter(row => row.trim() !== '');
                 const tableData = rows.map(row => {
-                    return Array.from(row.querySelectorAll('td, th')).map(cell => cell.textContent.trim());
+                    // Улучшенный парсинг CSV с учетом кавычек
+                    const values = [];
+                    let current = '';
+                    let inQuotes = false;
+                    
+                    for (let i = 0; i < row.length; i++) {
+                        const char = row[i];
+                        
+                        if (char === '"') {
+                            inQuotes = !inQuotes;
+                        } else if (char === ',' && !inQuotes) {
+                            values.push(current);
+                            current = '';
+                        } else {
+                            current += char;
+                        }
+                    }
+                    values.push(current);
+                    return values.map(v => v.trim().replace(/^"|"$/g, ''));
                 });
 
-                // Модифицируем данные (пример: меняем порядок и формат)
+                // Отладочная информация
+                document.getElementById('debug').textContent = 
+                    `Загружено строк: ${tableData.length}. Пример данных: ${JSON.stringify(tableData.slice(0, 3))}`;
+
+                if (tableData.length < 2) {
+                    throw new Error('Таблица пуста или содержит мало данных');
+                }
+
+                // Модифицируем данные
                 const modifiedData = {
-                    title: tableData[1][0],  // Берем данные из второй строки, первого столбца
-                    imageUrl: tableData[2][0], // Третья строка, первый столбец - URL картинки
-                    description: `${tableData[3][0]} (модифицировано)` // Четвертая строка с добавлением текста
+                    // Берем данные из первых столбцов разных строк
+                    title: tableData[0][0] || 'Нет заголовка',
+                    imageUrl: tableData[1][0] || 'https://via.placeholder.com/300x200?text=No+Image',
+                    description: tableData[2][0] ? `${tableData[2][0]} (модифицировано)` : 'Нет описания',
+                    additionalData: tableData.slice(1).map(row => row.join(', ')).join(' | ')
                 };
 
                 // Отображаем модифицированные данные
@@ -73,7 +101,8 @@
             })
             .catch(error => {
                 console.error('Ошибка:', error);
-                document.getElementById('content').innerHTML = `Ошибка загрузки данных: ${error.message}`;
+                document.getElementById('content').innerHTML = 
+                    `<div class="error">Ошибка загрузки данных: ${error.message}</div>`;
             });
 
         function displayModifiedData(data) {
@@ -83,11 +112,19 @@
                 <div class="card">
                     <h2>${data.title}</h2>
                     <div class="image-container">
-                        <img src="${data.imageUrl}" alt="Загруженное изображение">
+                        <img src="${data.imageUrl}" alt="Изображение из таблицы" 
+                             onerror="this.src='https://via.placeholder.com/300x200?text=Image+Not+Found'">
                     </div>
-                    <p>${data.description}</p>
-                    <small>Данные загружены из Google Sheets и модифицированы</small>
+                    <p><strong>Описание:</strong> ${data.description}</p>
+                    <p><small>Дополнительные данные: ${data.additionalData}</small></p>
                 </div>
+                <h3>Как это работает:</h3>
+                <ol>
+                    <li>Скрипт загружает CSV-версию вашей таблицы</li>
+                    <li>Парсит данные в массив строк и столбцов</li>
+                    <li>Извлекает нужные значения из ячеек</li>
+                    <li>Отображает их с модификациями</li>
+                </ol>
             `;
         }
     </script>
