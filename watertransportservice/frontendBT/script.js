@@ -1,5 +1,5 @@
 // Конфигурация
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://web-production-240dc.up.railway.app/api';
 
 // DOM элементы
 const toursContainer = document.getElementById('tours-container');
